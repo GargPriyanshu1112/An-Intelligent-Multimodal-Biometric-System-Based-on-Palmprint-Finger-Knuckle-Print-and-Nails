@@ -1,7 +1,6 @@
 # Import dependencies
 import tensorflow as tf
 from tensorflow.keras.applications.densenet import DenseNet201
-from tensorflow.keras.models import Model
 from tensorflow.keras.layers import GlobalAveragePooling2D
 from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.layers import Dropout
