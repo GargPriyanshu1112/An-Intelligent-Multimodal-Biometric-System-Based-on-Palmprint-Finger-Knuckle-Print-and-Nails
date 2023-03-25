@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 import cv2
-import numpy as np
 import os
 
 
@@ -18,7 +17,7 @@ def get_random_image(dirpath):
     return file
 
 
-def histTransformFunc(r, alpha, beta):
+def histTransform(r, alpha, beta):
     n = -(r - alpha)
     d = beta
     s = 1 / (1 + np.exp(n/d))
@@ -50,23 +49,56 @@ def eme(X, patch_size):
 
 
 
+
+def preprocess(image, alpha=0.72, beta=0.30):
+    # Normalize the image
+    normalized_img = cv2.normalize(img, None, 0.0, 1.0, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+    # Apply histogram based transformation (s-curve)
+    transformed_img = histTransform(normalized_img, alpha, beta)
+    
+    # Get EME value of original image
+    original_eme = eme(image, patch_size=7)
+    # Get EME value of transformed image 
+    new_eme = eme(transformed_img, patch_size=7)
+        
+    if original_eme < new_eme:
+        return transformed_img, original_eme, new_eme
+    else:
+        return image, original_eme, new_eme
+    
+
+
+
+
+
+
+
+
+
 img = get_random_image(dataset_dirpath)
+image1, oeme, neme = preprocess(img)
+print(oeme, neme)
+
+##
 normalized_img = cv2.normalize(img, None, 0.0, 1.0, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-transformed_img = histTransformFunc(normalized_img, alpha=0.72, beta=0.30)
-
-
-
-plt.subplot(1, 2, 1)
-plt.imshow(img)
-plt.axis(False)
-plt.subplot(1, 2, 2)
-plt.imshow(transformed_img)
-plt.axis(False)
-# plt.subplot(1, 3, 3)
-# plt.imshow(normalized_img)
-
+transformed_img = histTransform(normalized_img, alpha=0.72, beta=0.30)
 print(f"eme original: {eme(img, 7)}")
 print(f"eme new_img : {eme(transformed_img, 7)}")
+##
+
+
+plt.subplot(1, 3, 1)
+plt.imshow(img)
+plt.axis(False)
+plt.subplot(1, 3, 2)
+plt.imshow(image1)
+plt.axis(False)
+plt.subplot(1, 3, 3)
+plt.imshow(transformed_img)
+plt.axis(False)
+
+# print(f"eme original: {eme(img, 7)}")
+# print(f"eme new_img : {eme(transformed_img, 7)}")
 
 
 
