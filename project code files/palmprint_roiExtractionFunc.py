@@ -22,7 +22,10 @@ def get_random_img(dirpath):
 
 
 # Get random imagefile
-image = get_random_img(dataset_dirpath)
+# image = get_random_img(dataset_dirpath)
+
+img_fpath = os.path.join(dataset_dirpath, 'Hand_0003640.jpg')
+image = plt.imread(img_fpath)
 
 
   
@@ -55,12 +58,12 @@ def rotate_image(image, x1, y1, x2, y2):
 
 
 
-def segment_palmprint_roi(rotated_image, X0, Y0, X9, Y9):
+def segment_palmprint_roi(rotated_image, x0, y0, x9, y9):
     window_w = 250 
     window_h = 250
     
-    y = Y0 + ((Y9-Y0) / 2)
-    x = X9
+    y = y0 + ((y9-y0) / 2)
+    x = x9
     
     roi = rotated_image[int(y-(window_h/2)): int(y+(window_h/2)),
                         int(x-(window_w/2)): int(x+(window_w/2)),
