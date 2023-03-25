@@ -11,7 +11,7 @@ def load_model(num_outputs, inp_shape=(224, 224, 3)):
     # Load DenseNet201
     base_model = DenseNet201(input_shape=inp_shape, include_top=False)
 
-    # Freeze the base model, so the underlying pre-trained patterns
+    # Freeze base model, so the underlying pre-trained patterns
     # aren't updated during training
     base_model.trainable = False 
 
