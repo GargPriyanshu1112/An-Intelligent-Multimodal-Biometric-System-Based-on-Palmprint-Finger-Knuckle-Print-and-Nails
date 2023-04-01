@@ -15,12 +15,13 @@ new_dataset_dirpath = "E:/college_project/new_dataset/"
 
 REQD_PALMAR_IMGS = 12
 REQD_DORSAL_IMGS = 16
-
+PERSONS_REQD = 165
+ 
 
 def save_files(ID, idx, files, hand_type):
     for fname in files:
         os.rename(src=os.path.join(dataset_dirpath, fname),
-                  dst=os.path.join(new_dataset_dirpath, f"{ID}_{hand_type}_{idx}.jpg"))
+                  dst=os.path.join(new_dataset_dirpath, f"{hand_type}/", f"{ID}_{idx}.jpg"))
                 
         if idx != 12:
             idx += 1
@@ -44,7 +45,7 @@ def get_augmented_images_and_save_them(ID, num_reqd, image_filename, hand_type):
     while(num_reqd > 0):
         img = aug_iter.next()[0].astype('uint8') # augmented image
         # Assign a name to the augmented image
-        fname = os.path.join(new_dataset_dirpath, f"{ID}_{hand_type}_{idx}_aug.jpg")
+        fname = os.path.join(new_dataset_dirpath, f"{hand_type}/", f"{ID}_{idx}_aug.jpg")
         # Save the augmented image
         cv.imwrite(fname, img)
         
@@ -66,7 +67,8 @@ unique_ids = metadata.id.unique()
 # Loop through each id (person). If number of palmar/dorsal images is less than
 # the required number (12 and 16 respectively), add augmented palmar/dorsal
 # images in the dataset. For this, select a random image and get its augmentations.
-for ID in unique_ids[100: 105]: 
+person_num = 0
+for ID in unique_ids[112: 117]:
     # Get inner-hand image names list
     palmar_img_fnames = metadata[(metadata.id == ID) & (metadata.aspectOfHand == 'palmar right')].imageName.values.tolist()
     # Ger upper-hand image names list
@@ -75,8 +77,8 @@ for ID in unique_ids[100: 105]:
     # Number of palmar and dorsal images of the present id
     num_palmar_imgs, num_dorsal_imgs = len(palmar_img_fnames), len(dorsal_img_fnames)
     
-    if (num_palmar_imgs and num_dorsal_imgs):   
-        
+    if (num_palmar_imgs and num_dorsal_imgs):
+            
         # *****************************   FOR PALMAR IMAGES  *************************************** #
         
         if num_palmar_imgs < REQD_PALMAR_IMGS+1:
@@ -123,3 +125,10 @@ for ID in unique_ids[100: 105]:
             save_files(ID=ID, idx=1, files=dorsal_img_fnames, hand_type="dorsal")
         
         # ****************************************************************************************** #
+        
+        person_num += 1
+        
+        # If biometrics of required number of individuals is collected,
+        # exit the loop
+        if person_num == PERSONS_REQD:
+            break
