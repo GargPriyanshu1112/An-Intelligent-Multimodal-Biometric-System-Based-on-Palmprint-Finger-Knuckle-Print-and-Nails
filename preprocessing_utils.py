@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 
 
-def histTransform(r, alpha, beta):
+def s_curve_transform(r, alpha, beta):
     n = -(r - alpha)
     d = beta
     s = 1 / (1 + np.exp(n/d))
@@ -18,7 +18,7 @@ def preprocess(image, alpha=0.82, beta=0.30, gray_scale=True):
     # Normalize the image
     normalized_img = cv2.normalize(image, None, 0.0, 1.0, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
     # Apply Local s-Curve Transformation
-    transformed_img = histTransform(normalized_img, alpha, beta)
+    transformed_img = s_curve_transform(normalized_img, alpha, beta)
     return transformed_img
 
 
