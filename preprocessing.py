@@ -1,12 +1,6 @@
 # Import dependencies
 import numpy as np
 import cv2
-import os
-from PIL import Image
-
-# Set up path
-DATASET_DIRPATH = "E:/college_project/dataset/" # change to new dataset `dirpath`
-PREPROCESSING_RESULTS_DIRPATH = "E:/" # change accordingly
 
 
 def histTransform(r, alpha, beta):
@@ -14,6 +8,18 @@ def histTransform(r, alpha, beta):
     d = beta
     s = 1 / (1 + np.exp(n/d))
     return s
+
+
+def preprocess(image, alpha=0.82, beta=0.30, gray_scale=True):
+    if gray_scale:
+        # Convert the image to grayscale
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        
+    # Normalize the image
+    normalized_img = cv2.normalize(image, None, 0.0, 1.0, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+    # Apply Local s-Curve Transformation
+    transformed_img = histTransform(normalized_img, alpha, beta)
+    return transformed_img
 
 
 def eme(X, patch_size):
@@ -39,38 +45,3 @@ def eme(X, patch_size):
     E = (E / r) / c
     return E
 
-
-def preprocess(image, alpha=0.72, beta=0.30):
-    # Normalize the image
-    normalized_img = cv2.normalize(image, None, 0.0, 1.0, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-    # Apply histogram based transformation (s-curve)
-    transformed_img = histTransform(normalized_img, alpha, beta)
-    
-    # Get EME value of original image
-    original_eme = eme(image, patch_size=7)
-    # Get EME value of transformed image 
-    new_eme = eme(transformed_img, patch_size=7)
-        
-    if original_eme < new_eme:
-        return transformed_img
-    else:
-        return image    
-
-
-
-for folder in os.listdir(DATASET_DIRPATH):
-    for fname in os.listdir(os.path.join(DATASET_DIRPATH, folder)):
-        
-        CURRENT_PATH = os.path.join(DATASET_DIRPATH, folder, fname)
-        DESTINATION_PATH = os.path.join(PREPROCESSING_RESULTS_DIRPATH, folder, fname)
-        
-        # Read image file
-        image = Image.open(CURRENT_PATH)
-        image = np.array(image)
-        
-        # Preprocess the image
-        result = preprocess(image)
-        
-        # Save the resultant image
-        imagefile = Image.fromarray(result)
-        imagefile.save(DESTINATION_PATH)
