@@ -8,7 +8,7 @@ from roi_extraction_utils import get_inner_hand_surface_ROI
 
 
 
-def load_data(dirpath):
+def load_palmar_data(dirpath):
     rois, labels = [], []
 
     for fname in os.listdir(dirpath):
@@ -20,9 +20,10 @@ def load_data(dirpath):
         # Assign image-id as its label
         label = re.search("[0-9]+", fname)
         label = int(label.group()) # label.dtype == 'int32'
-        
-        rois.append(roi)
-        labels.append(label)
+
+        if roi is not None:
+            rois.append(roi)
+            labels.append(label)
     
     rois, labels = np.array(rois), np.array(labels)
     return rois, labels
