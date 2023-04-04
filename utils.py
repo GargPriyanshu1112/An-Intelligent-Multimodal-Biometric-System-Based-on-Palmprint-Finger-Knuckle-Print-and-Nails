@@ -4,6 +4,7 @@ from PIL import Image
 import numpy as np
 import re
 
+from preprocessing_utils import preprocess
 from roi_extraction_utils import get_inner_hand_surface_ROI
 
 
@@ -15,6 +16,8 @@ def load_palmar_data(dirpath):
         # Read the content of the file
         image = Image.open(os.path.join(dirpath, fname))
         image = np.array(image)
+        # Preprocess the image
+        image = preprocess(image)
         # Extract ROI (palmprint)
         roi = get_inner_hand_surface_ROI(image)
         # Assign image-id as its label
