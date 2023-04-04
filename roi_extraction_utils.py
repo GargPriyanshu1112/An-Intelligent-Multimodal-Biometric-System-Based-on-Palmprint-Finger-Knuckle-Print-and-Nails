@@ -31,10 +31,7 @@ def rotate_image(image, x1, y1, x2, y2):
 
 
 
-def segment_palmprint_roi(rotated_image, x0, y0, x9, y9):
-    window_w = 250 
-    window_h = 250
-    
+def segment_palmprint_roi(rotated_image, x0, y0, x9, y9, window_w=224, window_h=224):    
     y = y0 + ((y9-y0) / 2)
     x = x9
     
