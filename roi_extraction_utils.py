@@ -70,10 +70,11 @@ def get_inner_hand_surface_ROI(image, confidence=0.8):
             x9, y9 = np.multiply(normalized_coordinates, scaling_factor).astype(int)
             
             # Rotate the image
-            rotated_image = rotate_image(image, x0, y0, x9, y9)
+            if not abs(x0 - x9) == 0:
+                image = rotate_image(image, x0, y0, x9, y9)
             
             # Segment the palmprint region of interest
-            roi = segment_palmprint_roi(rotated_image, x0, y0, x9, y9)
+            roi = segment_palmprint_roi(image, x0, y0, x9, y9)
             
             return roi
 
