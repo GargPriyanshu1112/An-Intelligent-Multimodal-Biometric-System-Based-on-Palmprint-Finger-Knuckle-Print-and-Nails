@@ -10,7 +10,7 @@ from roi_extraction_utils import get_inner_hand_surface_ROI, get_landmark_ROI
 
 
 
-def load_palmar_data(dirpath, roi_h, roi_w):
+def load_palmar_data(dirpath, roi_h, roi_w, gray_scale=True):
     rois, labels = [], []
 
     for fname in os.listdir(dirpath):
@@ -24,7 +24,7 @@ def load_palmar_data(dirpath, roi_h, roi_w):
         label = int(label.group()) # label.dtype == 'int32'
 
         if roi is not None:
-            roi = preprocess(roi)
+            roi = preprocess(roi, gray_scale)
             rois.append(roi)
             labels.append(label)
     
