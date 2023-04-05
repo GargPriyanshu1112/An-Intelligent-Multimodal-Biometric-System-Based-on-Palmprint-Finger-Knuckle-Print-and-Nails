@@ -86,6 +86,9 @@ def get_inner_hand_surface_ROI(image, confidence=0.8):
 
 mp_hands = mp.solutions.hands
 def get_upper_hand_surface_ROIs(image, confidence=0.8):
+    """
+    Returns ROI of all the landmarks
+    """
     rois = [] # will store all the segmented region of interests
     
     with mp_hands.Hands(min_detection_confidence=confidence) as hands:
@@ -138,7 +141,57 @@ def get_upper_hand_surface_ROIs(image, confidence=0.8):
                 roi = tf.image.resize(roi, size=(224, 224))
                 
                 rois.append(roi)
-                
             return rois
+
         
+
+mp_hands = mp.solutions.hands
+def get_landmark_ROI(image, i, confidence=0.7, n_h=224, n_w=224):
+    """
+    Returns ROI of the i-th landmark
+    """
+    with mp_hands.Hands(min_detection_confidence=confidence) as hands:
+        image.flags.writeable = False   
+        results = hands.process(image)
+        image.flags.writeable = True
+        
+        # If the model detects hand landmarks
+        if results.multi_hand_landmarks:
+            # Get the landmarks (normalized)
+            landmarks = results.multi_hand_landmarks[0]
+            
+            scaling_factor = [image.shape[1], image.shape[0]]
+            
+            # Extract coordinates of i-th landmark
+            normalized_coordinates = np.array((landmarks.landmark[i].x, landmarks.landmark[i].y))
+            x, y = tuple(np.multiply(normalized_coordinates, scaling_factor).astype(int))
+            
+            # If x and y coordinates of the landmark are such that complete
+            # roi can't be extracted (possible when the bounding box falls out
+            # of the image), then skip the image
+            if (x < 80 or x > image.shape[1]-80) or (y < 92 or y > image.shape[0]-92):
+                return None
+            
+            # Get the dimensions(height & width) of the roi
+            if i in [2, 5, 9, 13, 17]:
+                window_w, window_h = 150, 168
+                
+            elif i in [3, 6, 10, 14, 18]:
+                window_w, window_h = 150, 160
+
+            elif i in [7, 11, 15, 19]:
+                window_w, window_h = 150, 140
+
+            elif i in [4, 8, 12, 16, 20]:
+                window_w, window_h = 160,  184
+                
+            # Segment the region of interest
+            roi = image[int(y-(window_h/2)): int(y+(window_h/2)),
+                        int(x-(window_w/2)): int(x+(window_w/2)),
+                        :] 
+            
+            # Resize the roi
+            roi = tf.image.resize(roi, size=(n_h, n_w))
+    return roi
+    
 ## *************************************************************************************** ##
