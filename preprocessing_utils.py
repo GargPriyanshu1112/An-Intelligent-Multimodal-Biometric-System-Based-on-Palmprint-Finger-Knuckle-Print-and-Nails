@@ -10,7 +10,7 @@ def s_curve_transform(r, alpha, beta):
     return s
 
 
-def preprocess(image, alpha=0.82, beta=0.30, gray_scale=True):
+def preprocess(image, gray_scale, alpha=0.82, beta=0.30):
     if gray_scale:
         # Convert the image to grayscale
         image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
