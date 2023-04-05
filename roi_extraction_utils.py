@@ -192,6 +192,6 @@ def get_landmark_ROI(image, i, confidence=0.7, n_h=224, n_w=224):
             
             # Resize the roi
             roi = tf.image.resize(roi, size=(n_h, n_w))
-    return roi
+        return roi
     
 ## *************************************************************************************** ##
