@@ -31,20 +31,20 @@ def rotate_image(image, x1, y1, x2, y2):
 
 
 
-def segment_palmprint_roi(rotated_image, x0, y0, x9, y9, window_w=224, window_h=224):    
+def segment_palmprint_roi(image, x0, y0, x9, y9, roi_h, roi_w):    
     y = y0 + ((y9-y0) / 2)
     x = x9
     
-    roi = rotated_image[int(y-(window_h/2)): int(y+(window_h/2)),
-                        int(x-(window_w/2)): int(x+(window_w/2)),
-                        :]    
+    roi = image[int(y-(roi_h/2)): int(y+(roi_h/2)),
+                int(x-(roi_w/2)): int(x+(roi_w/2)),
+                :]    
     
     return roi
 
 
 
 mp_hands = mp.solutions.hands
-def get_inner_hand_surface_ROI(image, confidence=0.8):       
+def get_inner_hand_surface_ROI(image, roi_h, roi_w, confidence=0.8):       
     with mp_hands.Hands(min_detection_confidence=confidence) as hands:
         image.flags.writeable = False   
         results = hands.process(image)
@@ -71,7 +71,7 @@ def get_inner_hand_surface_ROI(image, confidence=0.8):
                 image = rotate_image(image, x0, y0, x9, y9)
             
             # Segment the palmprint region of interest
-            roi = segment_palmprint_roi(image, x0, y0, x9, y9)
+            roi = segment_palmprint_roi(image, x0, y0, x9, y9, roi_h, roi_w)
             
             return roi
 
