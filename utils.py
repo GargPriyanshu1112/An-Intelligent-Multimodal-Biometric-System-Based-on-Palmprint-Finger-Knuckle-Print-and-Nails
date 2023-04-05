@@ -10,7 +10,7 @@ from roi_extraction_utils import get_inner_hand_surface_ROI, get_landmark_ROI
 
 
 
-def load_palmar_data(dirpath):
+def load_palmar_data(dirpath, roi_h, roi_w):
     rois, labels = [], []
 
     for fname in os.listdir(dirpath):
@@ -18,7 +18,7 @@ def load_palmar_data(dirpath):
         image = Image.open(os.path.join(dirpath, fname))
         image = np.array(image)
         # Extract ROI (palmprint)
-        roi = get_inner_hand_surface_ROI(image)
+        roi = get_inner_hand_surface_ROI(image, roi_h, roi_w)
         # Assign image-id as its label
         label = re.search("[0-9]+", fname)
         label = int(label.group()) # label.dtype == 'int32'
