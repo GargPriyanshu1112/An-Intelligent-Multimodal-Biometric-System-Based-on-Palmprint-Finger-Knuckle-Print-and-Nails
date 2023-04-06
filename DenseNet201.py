@@ -33,7 +33,3 @@ def load_DenseNet201(num_outputs, inp_shape=(224, 224, 3)):
                       metrics=["accuracy"])
 
     return new_model
-
-
-m = load_DenseNet201(num_outputs=170, inp_shape=(224, 224, 3))
-m.summary()
