@@ -41,7 +41,7 @@ def load_dorsal_data(dirpath, landmark):
         image = Image.open(os.path.join(dirpath, fname))
         image = np.array(image)
         # Extract landmark ROI
-        roi = get_landmark_ROI(image)
+        roi = get_landmark_ROI(image, landmark)
         # Assign image-id as its label
         label = re.search("[0-9]+", fname)
         label = int(label.group()) # label.dtype == 'int32'
