@@ -47,7 +47,7 @@ def load_dorsal_data(dirpath, landmark):
         label = int(label.group()) # label.dtype == 'int32'
 
         if roi is not None:
-            roi = preprocess(roi, gray_scale=False)
+            roi = preprocess(np.array(roi), gray_scale=False)
             rois.append(roi)
             labels.append(label)
     
