@@ -28,7 +28,7 @@ def load_DenseNet201(num_outputs, inp_shape=(224, 224, 3)):
     new_model.add(Dense(units=num_outputs, activation='softmax'))
     
     # Compile the model
-    new_model.compile(loss="categorical_crossentropy",
+    new_model.compile(loss="sparse_categorical_crossentropy",
                       optimizer=SGD(learning_rate=0.001, momentum=0.9, nesterov=True),
                       metrics=["accuracy"])
 
