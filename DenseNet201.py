@@ -9,7 +9,7 @@ from tensorflow.keras.optimizers import SGD
 
 
 def load_DenseNet201(num_outputs, inp_shape=(224, 224, 3)):
-    # Load DenseNet201
+    # Load pre-trained DenseNet201
     base_model = DenseNet201(input_shape=inp_shape, include_top=False)
 
     # Freeze base model, so the underlying pre-trained patterns aren't
@@ -25,7 +25,7 @@ def load_DenseNet201(num_outputs, inp_shape=(224, 224, 3)):
     new_model.add(Dense(units=4096, activation='relu'))
     new_model.add(Dropout(rate=0.6))
     new_model.add(BatchNormalization(momentum=0.9))
-    new_model.add(Dense(units=num_outputs, activation='softmax'))
+    new_model.add(Dense(units=num_outputs, activation='softmax')) 
     
     # Compile the model
     new_model.compile(loss="sparse_categorical_crossentropy",
