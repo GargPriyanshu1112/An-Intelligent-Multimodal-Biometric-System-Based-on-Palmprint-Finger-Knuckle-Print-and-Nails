@@ -81,7 +81,6 @@ def get_inner_hand_surface_ROI(image, roi_h, roi_w, confidence=0.8):
 
 
 
-
 ## **************  UTILITIES FOR FINGER NAILS & KNUCKLES ROI EXTRACTION  ***************** ##
 
 mp_hands = mp.solutions.hands
@@ -193,6 +192,7 @@ def get_landmark_ROI(image, i, confidence=0.7, n_h=224, n_w=224):
             
             # Resize the roi
             roi = tf.image.resize(roi, size=(n_h, n_w))
+            roi = np.array(roi, dtype='uint8')
             
             return roi
     
