@@ -3,23 +3,25 @@ import numpy as np
 import cv2
 
 
-def s_curve_transform(r, alpha, beta):
-    n = -(r - alpha)
-    d = beta
-    s = 1 / (1 + np.exp(n/d))
-    return s
+def preprocess(image):
+    # Convert the image to LAB color space
+    lab = cv2.cvtColor(image, cv2.COLOR_RGB2LAB)
 
+    # Apply CLAHE on the L channel of LAB color space
+    clahe = cv2.createCLAHE(clipLimit=1, tileGridSize=(8,8))
+    l, a, b = cv2.split(lab)
+    l_clahe = clahe.apply(l)
 
-def preprocess(image, gray_scale, alpha=0.82, beta=0.30):
-    if gray_scale:
-        # Convert the image to grayscale
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-        
+    # Merge the CLAHE enhanced L channel with the original A and B channels
+    lab_clahe = cv2.merge((l_clahe, a, b))
+
+    # Convert the image back to RGB color space
+    clahe_rgb = cv2.cvtColor(lab_clahe, cv2.COLOR_LAB2RGB)
+    
     # Normalize the image
-    normalized_img = cv2.normalize(image, None, 0.0, 1.0, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-    # Apply Local s-Curve Transformation
-    transformed_img = s_curve_transform(normalized_img, alpha, beta)
-    return transformed_img
+    result = clahe_rgb / 255.
+    return result
+
 
 
 def eme(X, patch_size):
@@ -44,4 +46,3 @@ def eme(X, patch_size):
         m1 = m1 + patch_size
     E = (E / r) / c
     return E
-
