@@ -84,11 +84,11 @@ def get_inner_hand_surface_ROI(image, roi_h, roi_w, confidence=0.8):
 ## **************  UTILITIES FOR FINGER NAILS & KNUCKLES ROI EXTRACTION  ***************** ##
 
 mp_hands = mp.solutions.hands
-def get_upper_hand_surface_ROIs(image, confidence=0.8):
+def get_all_lanmark_ROIs(image, confidence=0.7, n_h=224, n_w=224):
     """
     Returns ROI of all the landmarks
     """
-    rois = [] # will store all the segmented region of interests
+    rois = [] # to store all the segmented ROIs
     
     with mp_hands.Hands(min_detection_confidence=confidence) as hands:
         image.flags.writeable = False   
@@ -97,16 +97,16 @@ def get_upper_hand_surface_ROIs(image, confidence=0.8):
         
         # If the model detects hand landmarks
         if results.multi_hand_landmarks:
-            # Get the landmarks
+            # Get the landmarks (normalized)
             landmarks = results.multi_hand_landmarks[0]
             
-            scale_factor = [image.shape[1], image.shape[0]]
+            scaling_factor = [image.shape[1], image.shape[0]]
             
             # Loop through each landmark
             for i in range(2, 21):
-                # Extract coordinates of i-th keypoint
+                # Extract coordinates of i-th landmark
                 normalized_coordinates = np.array((landmarks.landmark[i].x, landmarks.landmark[i].y))
-                x, y = tuple(np.multiply(normalized_coordinates, scale_factor).astype(int))
+                x, y = tuple(np.multiply(normalized_coordinates, scaling_factor).astype(int))
                 
                 # If x and y coordinates of a landmark are such that complete roi
                 # can't be extracted (possible when the bounding box falls out
@@ -131,16 +131,12 @@ def get_upper_hand_surface_ROIs(image, confidence=0.8):
                 roi = image[int(y-(window_h/2)): int(y+(window_h/2)),
                             int(x-(window_w/2)): int(x+(window_w/2)),
                             :] 
-                
-                # Normalize the roi, so the pixel values are between [0, 1]
-                roi = roi / 255.0
-                
-                # Resize the roi to 224 x 224, as the feature extraction 
-                # model (DenseNet201) expects a fixed sized input image
-                roi = tf.image.resize(roi, size=(224, 224))
+                                
+                # Resize the roi
+                roi = tf.image.resize(roi, size=(n_h, n_w))
+                roi = np.array(roi, dtype='uint8')
                 
                 rois.append(roi)
-                
             return rois
 
         
