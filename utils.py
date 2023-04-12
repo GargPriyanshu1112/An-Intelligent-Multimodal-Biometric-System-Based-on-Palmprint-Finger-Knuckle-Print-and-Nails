@@ -1,6 +1,6 @@
 # Import dependencies
 import os
-from PIL import Image
+from PIL import Image, ImageOps
 import numpy as np
 import re
 
@@ -16,8 +16,10 @@ def load_palmar_data(dirpath, roi_h, roi_w):
         # Read file
         image = Image.open(os.path.join(dirpath, fname))
         image = np.array(image)
+        
         # Extract ROI (palmprint)
         roi = get_inner_hand_surface_ROI(image, roi_h, roi_w)
+        
         # Image label
         label = re.search("[0-9]+", fname)
         label = int(label.group()) 
@@ -38,9 +40,12 @@ def load_dorsal_data(dirpath, landmark):
     for fname in os.listdir(dirpath):
         # Read file
         image = Image.open(os.path.join(dirpath, fname))
+        image = ImageOps.expand(image, border=(80,0,80,90), fill='white') # add border
         image = np.array(image)
+        
         # Extract landmark ROI
         roi = get_landmark_ROI(image, landmark)
+        
         # Image label
         label = re.search("[0-9]+", fname)
         label = int(label.group())
