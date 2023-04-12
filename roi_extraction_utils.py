@@ -44,8 +44,8 @@ def segment_palmprint_roi(image, x0, y0, x9, y9, roi_h, roi_w):
 
 
 mp_hands = mp.solutions.hands
-def get_inner_hand_surface_ROI(image, roi_h, roi_w, confidence=0.8):       
-    with mp_hands.Hands(min_detection_confidence=confidence) as hands:
+def get_inner_hand_surface_ROI(image, roi_h, roi_w):       
+    with mp_hands.Hands(min_detection_confidence=0.2) as hands:
         image.flags.writeable = False   
         results = hands.process(image)
         image.flags.writeable = True
@@ -84,13 +84,13 @@ def get_inner_hand_surface_ROI(image, roi_h, roi_w, confidence=0.8):
 ## **************  UTILITIES FOR FINGER NAILS & KNUCKLES ROI EXTRACTION  ***************** ##
 
 mp_hands = mp.solutions.hands
-def get_all_lanmark_ROIs(image, confidence=0.7, n_h=224, n_w=224):
+def get_all_lanmark_ROIs(image, n_h=224, n_w=224):
     """
     Returns ROI of all the landmarks
     """
     rois = [] # to store all the segmented ROIs
     
-    with mp_hands.Hands(min_detection_confidence=confidence) as hands:
+    with mp_hands.Hands(min_detection_confidence=0.2) as hands:
         image.flags.writeable = False   
         results = hands.process(image)
         image.flags.writeable = True
@@ -142,11 +142,11 @@ def get_all_lanmark_ROIs(image, confidence=0.7, n_h=224, n_w=224):
         
 
 mp_hands = mp.solutions.hands
-def get_landmark_ROI(image, i, confidence=0.7, n_h=224, n_w=224):
+def get_landmark_ROI(image, i, n_h=224, n_w=224):
     """
     Returns ROI of the i-th landmark
     """
-    with mp_hands.Hands(min_detection_confidence=confidence) as hands:
+    with mp_hands.Hands(min_detection_confidence=0.2) as hands:
         image.flags.writeable = False   
         results = hands.process(image)
         image.flags.writeable = True
