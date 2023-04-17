@@ -84,7 +84,7 @@ def get_inner_hand_surface_ROI(image, roi_h, roi_w):
 ## **************  UTILITIES FOR FINGER NAILS & KNUCKLES ROI EXTRACTION  ***************** ##
 
 mp_hands = mp.solutions.hands
-def get_all_lanmark_ROIs(image, n_h=224, n_w=224):
+def get_all_landmarks_ROI(image, n_h=224, n_w=224):
     """
     Returns ROI of all the landmarks
     """
@@ -95,49 +95,48 @@ def get_all_lanmark_ROIs(image, n_h=224, n_w=224):
         results = hands.process(image)
         image.flags.writeable = True
         
-        # If the model detects hand landmarks
-        if results.multi_hand_landmarks:
-            # Get the landmarks (normalized)
-            landmarks = results.multi_hand_landmarks[0]
+        # Get the landmarks (normalized)
+        landmarks = results.multi_hand_landmarks[0]
+        
+        scaling_factor = [image.shape[1], image.shape[0]]
+        
+        # Loop through each landmark
+        for i in range(2, 21):
+            # Extract coordinates of i-th landmark
+            normalized_coordinates = np.array((landmarks.landmark[i].x, landmarks.landmark[i].y))
+            x, y = tuple(np.multiply(normalized_coordinates, scaling_factor).astype(int))
             
-            scaling_factor = [image.shape[1], image.shape[0]]
+            # If unable to extract landmark roi (possible when x & y coordinates
+            # are such that the roi falls out of the image), use a blank image
+            # in its place.
+            if (x < 80 or x > image.shape[1]-80) or (y < 92 or y > image.shape[0]-92):
+                rois.append(np.ones((n_h, n_w, 3), dtype='uint8')*255)
+                continue
             
-            # Loop through each landmark
-            for i in range(2, 21):
-                # Extract coordinates of i-th landmark
-                normalized_coordinates = np.array((landmarks.landmark[i].x, landmarks.landmark[i].y))
-                x, y = tuple(np.multiply(normalized_coordinates, scaling_factor).astype(int))
+            # Get the dimensions(height & width) of the roi
+            if i in [2, 5, 9, 13, 17]:
+                window_w, window_h = 150, 168
                 
-                # If x and y coordinates of a landmark are such that complete roi
-                # can't be extracted (possible when the bounding box falls out
-                # of the image), then skip the landmark
-                if (x < 80 or x > image.shape[1]-80) or (y < 92 or y > image.shape[0]-92):
-                    continue
-                
-                # Get the dimensions(height & width) of the roi
-                if i in [2, 5, 9, 13, 17]:
-                    window_w, window_h = 150, 168
-                    
-                elif i in [3, 6, 10, 14, 18]:
-                    window_w, window_h = 150, 160
+            elif i in [3, 6, 10, 14, 18]:
+                window_w, window_h = 150, 160
 
-                elif i in [7, 11, 15, 19]:
-                    window_w, window_h = 150, 140
+            elif i in [7, 11, 15, 19]:
+                window_w, window_h = 150, 140
 
-                elif i in [4, 8, 12, 16, 20]:
-                    window_w, window_h = 160,  184
-                    
-                # Segment the region of interest
-                roi = image[int(y-(window_h/2)): int(y+(window_h/2)),
-                            int(x-(window_w/2)): int(x+(window_w/2)),
-                            :] 
-                                
-                # Resize the roi
-                roi = tf.image.resize(roi, size=(n_h, n_w))
-                roi = np.array(roi, dtype='uint8')
+            elif i in [4, 8, 12, 16, 20]:
+                window_w, window_h = 160,  184
                 
-                rois.append(roi)
-            return rois
+            # Segment the region of interest
+            roi = image[int(y-(window_h/2)): int(y+(window_h/2)),
+                        int(x-(window_w/2)): int(x+(window_w/2)),
+                        :] 
+                            
+            # Resize the roi
+            roi = tf.image.resize(roi, size=(n_h, n_w))
+            roi = np.array(roi, dtype='uint8')
+            
+            rois.append(roi)
+        return rois
 
         
 
