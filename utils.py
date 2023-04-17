@@ -3,6 +3,7 @@ import os
 from PIL import Image, ImageOps
 import numpy as np
 import re
+import mediapipe as mp
 
 from preprocessing_utils import preprocess
 from roi_extraction_utils import get_inner_hand_surface_ROI, get_landmark_ROI
@@ -57,3 +58,13 @@ def load_dorsal_data(dirpath, landmark):
     
     rois, labels = np.array(rois), np.array(labels)
     return rois, labels
+
+
+
+mp_hands = mp.solutions.hands
+def landmarks_available(image):
+    with mp_hands.Hands(min_detection_confidence=0.2) as hands:
+        image.flags.writeable = False   
+        results = hands.process(image)
+        image.flags.writeable = True  
+        return results.multi_hand_landmarks
